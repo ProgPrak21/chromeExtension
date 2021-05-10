@@ -9,6 +9,14 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "content_scripts":[
+    {
+      "matches":[
+        "https://www.instagram.com/*"
+      ],
+      "js": ["connectors/com.instagram.js"]
+    }
+  ],
   "permissions": [
     "tabs",
     "storage",
