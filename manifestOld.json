@@ -3,16 +3,25 @@
   "description": "Build an Extension!",
   "version": "1.0",
   "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html"
   },
-  "permissions": [
-    "activeTab",
-    "tabs",
-    "scripting"
+  "content_scripts":[
+    {
+      "matches":[
+        "https://www.instagram.com/*"
+      ],
+      "js": ["connectors/com.instagram.js"]
+    }
   ],
-  "host_permissions": [
-    "https://www.instagram.com/*"
+  "permissions": [
+    "tabs",
+    "storage",
+    "activeTab",
+    "scripting"
   ],
   "icons": {
     "16": "/images/get_started16.png",
