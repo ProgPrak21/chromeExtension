@@ -31,16 +31,19 @@ async function getCurrentTab() {
 }
 
 (async function(){
-  var supportedHosts =  [
-  'www.instagram.com', 'www.facebook.com', 'www.ebay.de','www.redit.com'
-  ]
+  var supportedHosts =  {
+  'www.instagram.com':'https://www.instagram.com/download/request/', 
+  'www.facebook.com':'www.facebook.com', 
+  'www.ebay.de':'www.ebay.de',
+  'www.redit.com':'www.redit.com'
+  }
 
   tab = await getCurrentTab();
   const url = tab.url;
   const { hostname } = new URL(url);
   
   // Is the current site supported?
-  if (supportedHosts.includes(hostname)) {
+  if (supportedHosts.hasOwnProperty(hostname)) {
     // If yes: offer to request data
 
     // Update popup.html
@@ -61,7 +64,7 @@ async function getCurrentTab() {
     // inject connectors/tld.domain.subdomain into requestURL
     issueRequestBtn.addEventListener("click", async () => {
       // open the page to request the data in the current tab
-      var requestURL = "https://www.instagram.com/download/request/";
+      var requestURL = supportedHosts[hostname];
       let tab = await getCurrentTab();
       
       await goToUrl(tab, requestURL);
@@ -69,7 +72,7 @@ async function getCurrentTab() {
       
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        files: ['connectors/com.instagram.js']
+        files: [`connectors/${hostname}.js`]
       });
     });
 
