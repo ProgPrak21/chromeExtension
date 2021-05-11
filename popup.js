@@ -1,17 +1,3 @@
-// not working yet
-function createUrl(url) {
-  return chrome.tabs.create({url}, function(tab) {
-    return tab, new Promise(resolve => {
-      chrome.tabs.onUpdated.addListener(function onUpdated(tabId, info) {
-        if (tab.id === tabId && info.status === 'complete') {
-          chrome.tabs.onUpdated.removeListener(onUpdated);
-          resolve();
-        }
-      });
-    });
-  });
-}
-
 function goToUrl(tab, url) {
   chrome.tabs.update(tab.id, {url});
   return new Promise(resolve => {
@@ -46,7 +32,7 @@ async function getCurrentTab() {
   if (supportedHosts.hasOwnProperty(hostname)) {
     // If yes: offer to request data
 
-    // Update popup.html
+    // Update popup.html description div
     let descriptionDiv = document.getElementById("description");
     descriptionDiv.innerHTML = "This Site is supported!";
 
@@ -60,8 +46,7 @@ async function getCurrentTab() {
     let br = document.createElement("br");
     document.body.insertBefore(br, issueRequestBtn);
 
-    // When the button is clicked, 
-    // inject connectors/tld.domain.subdomain into requestURL
+    // When the button is clicked, inject connectors/tld.domain.subdomain.js into requestURL
     issueRequestBtn.addEventListener("click", async () => {
       // open the page to request the data in the current tab
       var requestURL = supportedHosts[hostname];
