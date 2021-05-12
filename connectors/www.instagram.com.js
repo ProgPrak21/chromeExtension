@@ -1,4 +1,15 @@
+function submitForm () {
+    document.getElementById('igCoreRadioButtonoutputFormatJSON').checked = true;
+    document.querySelector('form > div > button').click();
+}
 
-alert("Injected com.instagram.js!");
+function executeScript (tab) {
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: submitForm,
+      });
+}
 
-console.log("Injected com.instagram.js!");
+export async function run(tab) {
+    executeScript(tab);
+}

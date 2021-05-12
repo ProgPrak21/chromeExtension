@@ -24,7 +24,7 @@ async function getCurrentTab() {
   'www.redit.com':'www.redit.com'
   }
 
-  tab = await getCurrentTab();
+  var tab = await getCurrentTab();
   const url = tab.url;
   const { hostname } = new URL(url);
   
@@ -46,19 +46,14 @@ async function getCurrentTab() {
     let br = document.createElement("br");
     document.body.insertBefore(br, issueRequestBtn);
 
-    // When the button is clicked, inject connectors/tld.domain.subdomain.js into requestURL
+    // When the button is clicked, move to requestURL and execute connectors/tld.domain.subdomain.js
     issueRequestBtn.addEventListener("click", async () => {
       // open the page to request the data in the current tab
-      var requestURL = supportedHosts[hostname];
-      let tab = await getCurrentTab();
+      const connector = await import(`/connectors/${hostname}.js`)
       
-      await goToUrl(tab, requestURL);
-      //await createUrl(requestURL);
+      await goToUrl(tab, supportedHosts[hostname]);
+      await connector.run(tab);
       
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: [`connectors/${hostname}.js`]
-      });
     });
 
   } else {
