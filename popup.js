@@ -25,6 +25,7 @@ async function getCurrentTab() {
   }
 
   var tab = await getCurrentTab();
+
   const url = tab.url;
   const { hostname } = new URL(url);
   
