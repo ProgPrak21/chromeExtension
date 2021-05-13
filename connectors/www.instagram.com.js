@@ -39,9 +39,43 @@ async function verifyLoggedInStatus(tab) {
         return false;
     }
     return true;
+
+    async function dispatchDataRequest (tab) {
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: submitForm,
+    });
+}
+
+function syncDataRequestToStorage () {
+    const hostname = "instagram";
+    let date = +new(Date)
+
+    chrome.storage.sync.set({ hostname:date }, function() {
+        console.log('Synced '+ hostname +' : '+ date +' to browser storage.');
+      });
+}
+
+async function isDataRequestDispatched() {
+    // Now we must defer the page to the user, so that they can enter their
+    // password. We then listen for a succesfull AJAX call 
+    return new Promise((resolve) => {
+        chrome.webRequest.onCompleted.addListener(
+            (details) => {
+                if (details.statusCode === 200) {
+                    console.log('Successfully dispatched!')
+                    syncDataRequestToStorage();
+                    resolve();
+                    }
+                }),
+            {urls: [ 'https://www.instagram.com/download/request_download_data_ajax/' ]}
+    });
 }
 
 export async function run() {
+
+    await dispatchDataRequest(tab);
+    await isDataRequestDispatched();
 
     let descriptionDiv = document.getElementById("description");
     let tab = await getCurrentTab();

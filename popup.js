@@ -14,6 +14,9 @@ async function getCurrentTab() {
 
   let tab = await getCurrentTab();
 
+(async function(){
+  
+  let tab = await getCurrentTab();
   const url = tab.url;
   const { hostname } = new URL(url);
 
@@ -25,23 +28,24 @@ async function getCurrentTab() {
     let descriptionDiv = document.getElementById("description");
     descriptionDiv.innerHTML = "This Site is supported!";
 
-    // Create and initialize Button
-    let issueRequestBtn = document.createElement("button");
-    issueRequestBtn.id = "issueRequest";
+    // Create and initialize button
+    let issueRequestBtn = document.createElement("button"); 
+    issueRequestBtn.id ='issueRequest';
     issueRequestBtn.innerHTML = "Request Data";
     document.body.append(issueRequestBtn);
 
+    // Insert line break <br> between button and div
     let br = document.createElement("br");
     document.body.insertBefore(br, issueRequestBtn);
 
-    // When the button is clicked, move to requestURL and execute connectors/tld.domain.subdomain.js
+    // When clicked, move to requestURL and execute connectors/subdomain.domain.tld.js
     issueRequestBtn.addEventListener("click", async () => {
-      // open the page to request the data in the current tab
-      const connector = await import(`/connectors/${hostname}.js`);
+      
+      const connector = await import(`/connectors/${hostname}.js`)
       await connector.run(tab);
     });
   } else {
-    // it not, display something like:
+    // if not, display something like: 
     // Sorry we don't support data requests from this site yet, if you want to help to support more pages you can do so here (link).
     // Here(link) you can find all pages we support requesting data from.
 
