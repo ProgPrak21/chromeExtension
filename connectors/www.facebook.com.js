@@ -1,4 +1,15 @@
 function submitForm() {
+  let exist = Array.from(document.querySelectorAll("iframe")).map((iframe) =>
+    Array.from(
+      iframe.contentWindow.document.body.querySelectorAll('div[role="heading"]')
+    ).find((e) =>
+      e.textContent.startsWith("A copy of your information is being created.")
+    )
+  );
+
+  //TODO: find a better way than alert
+  if (exist) return alert("Request is pending!");
+
   Array.from(document.querySelectorAll("iframe")).forEach((iframe) => {
     Array.from(iframe.contentWindow.document.body.querySelectorAll("label"))
       ?.find((e) => e.textContent.startsWith("Format"))
