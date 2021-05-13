@@ -4,6 +4,7 @@ function submitForm() {
       ?.find((e) => e.textContent.startsWith("Format"))
       ?.querySelector("a")
       ?.click();
+
     Array.from(
       iframe.contentWindow.document.body.querySelectorAll(
         'a[role="menuitemcheckbox"]'
@@ -11,6 +12,7 @@ function submitForm() {
     )
       ?.find((e) => e.textContent === "JSON")
       ?.click();
+
     Array.from(iframe.contentWindow.document.body.querySelectorAll("button"))
       ?.find((el) => el.textContent === "Create File")
       ?.click?.();
