@@ -1,3 +1,15 @@
+function goToUrl(tab, url) {
+    chrome.tabs.update(tab.id, { url });
+    return new Promise((resolve) => {
+      chrome.tabs.onUpdated.addListener(function onUpdated(tabId, info) {
+        if (tabId === tab.id && info.status === "complete") {
+          chrome.tabs.onUpdated.removeListener(onUpdated);
+          resolve();
+        }
+      });
+    });
+  }
+
 function submitForm () {
     document.getElementById('igCoreRadioButtonoutputFormatJSON').checked = true;
     document.querySelector('form > div > button').click();
@@ -17,6 +29,8 @@ async function verifyLoggedInStatus() {
 
 
 export async function run(tab) {
-    executeScript(tab);
     await verifyLoggedInStatus();
+    await goToUrl(tab, 'https://www.instagram.com/download/request/')
+    executeScript(tab);
+    
 }

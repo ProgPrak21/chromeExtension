@@ -1,15 +1,3 @@
-function goToUrl(tab, url) {
-  chrome.tabs.update(tab.id, { url });
-  return new Promise((resolve) => {
-    chrome.tabs.onUpdated.addListener(function onUpdated(tabId, info) {
-      if (tabId === tab.id && info.status === "complete") {
-        chrome.tabs.onUpdated.removeListener(onUpdated);
-        resolve();
-      }
-    });
-  });
-}
-
 async function getCurrentTab() {
   let queryOptions = { active: true, currentWindow: true };
   let [tab] = await chrome.tabs.query(queryOptions);
@@ -50,8 +38,6 @@ async function getCurrentTab() {
     issueRequestBtn.addEventListener("click", async () => {
       // open the page to request the data in the current tab
       const connector = await import(`/connectors/${hostname}.js`);
-
-      await goToUrl(tab, supportedHosts[hostname]);
       await connector.run(tab);
     });
   } else {
