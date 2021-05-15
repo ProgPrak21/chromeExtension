@@ -37,7 +37,7 @@ async function getCurrentTab() {
     // When the button is clicked, move to requestURL and execute connectors/tld.domain.subdomain.js
     issueRequestBtn.addEventListener("click", async () => {
       // open the page to request the data in the current tab
-      const connector = await import(`/connectors/${hostname}.js`);
+      const connector = await import(`/connectors/${hostname}/script.js`);
       await connector.run(tab);
     });
   } else {
