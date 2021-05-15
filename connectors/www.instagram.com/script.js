@@ -18,7 +18,10 @@ async function verifyLoggedInStatus() {
     
     let tab = await openUrlInNewTab(profileUrl, false);
     // TODO: check if we get redirected to login page, if so, wait for user input.
-    
+    if (tab.url === 'https://www.instagram.com/accounts/login/?next=/accounts/access_tool/ads_interests') {
+        //TODO: Explain to the user via changing popup message that they first need to login
+        
+    }
     // Close tab when done
     chrome.tabs.remove(tab.id);
 }
