@@ -11,22 +11,24 @@ async function openUrlInNewTab(url, active) {
     });
 }
 
-async function verifyLoggedInStatus() {
-    const profileUrl = 'https://www.instagram.com/accounts/access_tool/ads_interests';
-    
-    let tab = await openUrlInNewTab(profileUrl, false);
-    // check if we get redirected to loginpage
-    
-    // Close tab when done
-    chrome.tabs.remove(tab);
+function submitForm () {
+    document.getElementById('igCoreRadioButtonoutputFormatJSON').checked = true;
+    document.querySelector('form > div > button').click();
+}
+
+function executeScript (tab) {
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: submitForm,
+      });
 }
 
 
-
 export async function run() {
-    await verifyLoggedInStatus();
+    let tab = await openUrlInNewTab('https://www.instagram.com/download/request/', true);
+    executeScript(tab);
+    // Wait for the Userinput 
     
-    // Fetch the data from the instagram API
-    
-      
+    // Close tab when done
+    chrome.tabs.remove(tab);   
 }
