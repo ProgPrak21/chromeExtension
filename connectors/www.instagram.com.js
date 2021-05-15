@@ -10,6 +10,13 @@ function executeScript (tab) {
       });
 }
 
+async function verifyLoggedInStatus() {
+    const profileUrl = 'https://www.instagram.com/accounts/access_tool/ads_interests';
+    window.loadURL(profileUrl);
+}
+
+
 export async function run(tab) {
     executeScript(tab);
+    await verifyLoggedInStatus();
 }
