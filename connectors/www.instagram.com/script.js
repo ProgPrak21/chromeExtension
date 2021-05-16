@@ -13,44 +13,105 @@ async function openUrlInNewTab(url, active) {
     });
 }
 
-async function verifyLoggedInStatus() {
-    const profileUrl = 'https://www.instagram.com/accounts/access_tool/ads_interests';
+async function waitForUserInput() {
+    return new Promise((resolve) => {
+        chrome.tabs.onUpdated.addListener(function _(tabId, info, tab) {
+            // make sure the status is 'complete' and it's the right tab
+            console.log(tab);
+            if (tab.url == profileUrl && info.status === "complete") {
+                chrome.tabs.onUpdated.removeListener(_);
+                console.log('resolved!')
+                resolve();
+            }
+        });
+    });
+}
+
+async function getAuthToken() {
     
+    let redirectUri = chrome.identity.getRedirectURL();
+    let clientId = chrome.runtime.id; // Probably needs updating before publishing.
+    let authUrl = "https://instagram.com/oauth/authorize/?" +
+        "client_id=" + clientId + "&" +
+        "response_type=token&" +
+        "redirect_uri=" + encodeURIComponent(redirectUri);
+
+    chrome.identity.launchWebAuthFlow({ url: authUrl, interactive: true },
+        function (responseUrl) {
+            console.log(responseUrl);
+            let accessToken = responseUrl.substring(responseUrl.indexOf("=") + 1);
+            console.log(accessToken);
+        }
+    );
+}
+
+async function verifyLoggedInStatus() {
+
+    // Try to open a (arbitrary) page wich requires us be logged into instagram
+    const profileUrl = 'https://www.instagram.com/accounts/access_tool/ads_interests';
     let tab = await openUrlInNewTab(profileUrl, false);
-    // TODO: check if we get redirected to login page, if so, wait for user input.
-    if (tab.url === 'https://www.instagram.com/accounts/login/?next=/accounts/access_tool/ads_interests') {
-        //TODO: Explain to the user via changing popup message that they first need to login
-        
+
+
+    // Check if we get redirected to login page
+    if (tab.url !== profileUrl) {
+        await chrome.tabs.update(tab.id, { active: true });
+
+        // TODO Explain via popup message that we first need the user to login
+        /*
+        let descriptionDiv = document.getElementById("description");
+        descriptionDiv.innerHTML = "We first need you to log in.";
+        alert('We first need you to log in');
+        */
+        chrome.notifications.create('', {
+            title: 'Instagram Authentication required',
+            message: 'We first need you to log into Instagram',
+            iconUrl: '',
+            type: 'basic'
+        });
+
+        await waitForUserInput();
+        //getAuthToken();
     }
     // Close tab when done
-    chrome.tabs.remove(tab.id);
+    console.log('Done');
+    // chrome.tabs.remove(tab.id);
 }
 
 async function fetchJsonFromAPI() {
-    
+
     // Now we do all API requests in order to retrieve the data
-    const responses = await Promise.all(
-        scrapingUrls.map(url => 
+    let responses = await Promise.all(
+        scrapingUrls.map(url =>
             fetch(url).then(response => response.json())
         )
     );
 
-    // We then transform the data so that we can return it to the handler
-    return responses.map(response => {
+    // We transform the data so that we can return it as json
+    responses = responses.map(response => {
         return {
-            filepath: `${response.page_name}.json`,
-            data: JSON.stringify(response.data.data, null, 4),
+            data_category: response.page_name,
+            data: response.data.data
         };
     });
+    return JSON.stringify(responses, null, 4)
 }
 
-
 export async function run() {
-    await verifyLoggedInStatus();
-    
+    // Make sure we have a authorized session
+    // await verifyLoggedInStatus();
+    // await getAuthToken();
+
     // Fetch the data from the instagram API
     let responses = await fetchJsonFromAPI();
     
-    // TODO Where should those jsons go?
-      
+    // TODO Where should the json go?
+    // We could also create a zip with jszip
+    
+    // For now we can offer to download them:
+	let blob = new Blob( [ responses ], { type: 'data:text/json;charset=utf-8m'	});
+	let url = URL.createObjectURL( blob );
+    chrome.downloads.download({
+        url: url,
+        filename: 'instagram_data.json'
+    });
 }
