@@ -13,11 +13,32 @@ function getAllStorageSyncData() {
     });
 }
 
+function syncDataRequestToStorage (hostname) {
+    let date = +new(Date)
+    chrome.storage.sync.set({ hostname:date }, function() {
+        console.log('Synced '+ hostname +' : '+ date +' to browser storage.');
+    });
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // todo
+    if (message === 'request-incoming') {
+        const url = sender.tab.url;
+        const { hostname } = new URL(url);
+        const connector = await import(`/connectors/${hostname}.js`)
+
+
+        if (await connector.isRequestSendToUrl()){
+            
+            syncDataRequestToStorage(hostname);
+        }
+    }
+});
+
 async function isDataRequestComplete(request) {
     // todo
     if (true) {
-
-        console.log("(tried to) Data Request is complete")
+        console.log("(Data Request is complete")
         return true;
     } else {
         return false;
@@ -25,16 +46,16 @@ async function isDataRequestComplete(request) {
 }
 
 async function downloadData() {
-    //todo
-    console.log("(tried to) Downloaded Data")
+    // todo
+    console.log("Downloaded Data")
 }
 
 chrome.alarms.onAlarm.addListener(() => {
 
     requests = await getAllStorageSyncData();
+    console.log("Fetched storage entries: "+requests)
+
     // check if any requests can be fullfilled
-    console.log("Fetched storage entries")
-    
     for (request in requests) {
         if (await isDataRequestComplete(request)){
             // download data and delete browser storage entry 
@@ -51,8 +72,6 @@ chrome.alarms.onAlarm.addListener(() => {
         console.log("Cleared alarm")
     }
 });
-
-//chrome.runtime.onInstalled.addListener(() => {});
 
 // Set alarm if storage changes and we have at least one storage entry
 chrome.storage.onChanged.addListener((changes, area) => {

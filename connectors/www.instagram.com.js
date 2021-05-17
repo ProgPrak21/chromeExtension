@@ -10,20 +10,14 @@ async function openUrl(tabToUpdate, url) {
     });
 }
 
-async function getCurrentTab() {
-    let queryOptions = { active: true, currentWindow: true };
-    let [tab] = await chrome.tabs.query(queryOptions);
-    return tab;
-}
-
 function submitForm() {
     document.getElementById('igCoreRadioButtonoutputFormatJSON').checked = true;
     document.querySelector('form > div > button').click();
     console.log('Hi from content script');
 }
 
-async function executeScript(tab) {
-    await chrome.scripting.executeScript({
+async function dispatchDataRequest (tab) {
+    chrome.scripting.executeScript({
         target: { tabId: tab.id },
         function: submitForm,
     });
@@ -39,24 +33,23 @@ async function verifyLoggedInStatus(tab) {
         return false;
     }
     return true;
-
-    async function dispatchDataRequest (tab) {
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        function: submitForm,
-    });
 }
 
-function syncDataRequestToStorage () {
-    const hostname = "instagram";
-    let date = +new(Date)
+export async function run(tab) {
 
-    chrome.storage.sync.set({ hostname:date }, function() {
-        console.log('Synced '+ hostname +' : '+ date +' to browser storage.');
-      });
+    let descriptionDiv = document.getElementById("description");
+    if (await verifyLoggedInStatus(tab)){
+        await dispatchDataRequest(tab);
+        descriptionDiv.innerHTML = "Please approve the data request.";
+        // TODO Send message to background that there is possibly request pending.
+        chrome.runtime.sendMessage(tab.id,'request-incoming');
+    } else {
+        // Explain that we first need the user to login
+        descriptionDiv.innerHTML = "We first need you to be logged into the service, please click me again afterwards.";
+    }
 }
 
-async function isDataRequestDispatched() {
+export async function isRequestSendToUrl(url) {
     // Now we must defer the page to the user, so that they can enter their
     // password. We then listen for a succesfull AJAX call 
     return new Promise((resolve) => {
@@ -65,25 +58,9 @@ async function isDataRequestDispatched() {
                 if (details.statusCode === 200) {
                     console.log('Successfully dispatched!')
                     syncDataRequestToStorage();
-                    resolve();
+                    resolve(true);
                     }
                 }),
-            {urls: [ 'https://www.instagram.com/download/request_download_data_ajax/' ]}
+            {urls: [ url ]}
     });
-}
-
-export async function run() {
-
-    await dispatchDataRequest(tab);
-    await isDataRequestDispatched();
-
-    let descriptionDiv = document.getElementById("description");
-    let tab = await getCurrentTab();
-    if (await verifyLoggedInStatus(tab)){
-        await executeScript(tab);
-        descriptionDiv.innerHTML = "Please approve the data request.";
-    } else {
-        // Explain that we first need the user to login
-        descriptionDiv.innerHTML = "We first need you to be logged into the service, please click me again afterwards.";
-    }
 }
