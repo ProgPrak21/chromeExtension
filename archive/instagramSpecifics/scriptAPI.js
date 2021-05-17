@@ -57,18 +57,7 @@ async function verifyLoggedInStatus() {
         await chrome.tabs.update(tab.id, { active: true });
 
         // TODO Explain via popup message that we first need the user to login
-        /*
-        let descriptionDiv = document.getElementById("description");
-        descriptionDiv.innerHTML = "We first need you to log in.";
-        alert('We first need you to log in');
-        */
-        chrome.notifications.create('', {
-            title: 'Instagram Authentication required',
-            message: 'We first need you to log into Instagram',
-            iconUrl: '',
-            type: 'basic'
-        });
-
+       
         await waitForUserInput();
         //getAuthToken();
     }
