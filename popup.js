@@ -11,10 +11,6 @@ async function getCurrentTab() {
     "www.ebay.de": "www.ebay.de",
     "www.reddit.com": "www.reddit.com",
   };
-
-  let tab = await getCurrentTab();
-
-(async function(){
   
   let tab = await getCurrentTab();
   const url = tab.url;
