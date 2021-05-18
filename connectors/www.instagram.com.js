@@ -53,3 +53,8 @@ export async function run() {
         descriptionDiv.innerHTML = "We first need you to be logged into the service, please click me again afterwards.";
     }
 }
+
+export async function download () {
+    // idea: listen whether a certain kind of url is opended?
+    // something like: https://www.instagram.com/download/confirm/xxxxxxxxxx/?dyi_job_id=xxxxxxxxxxxxxxx
+}
