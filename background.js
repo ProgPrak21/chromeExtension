@@ -27,8 +27,8 @@ async function getBytesInUseSync(key) {
 }
 
 async function isRequestSend(url) {
-    // Now we must defer the page to the user, so that they can enter their
-    // password. We then listen for a succesfull AJAX call 
+    // Now we must defer the page to the user, so that they can enter their password.
+    // We then listen for a succesfull AJAX call 
     return new Promise((resolve) => {
         chrome.webRequest.onCompleted.addListener((details) => {
             if (details.statusCode === 200) {
@@ -97,14 +97,6 @@ chrome.alarms.onAlarm.addListener(async () => {
         chrome.alarms.clearAll();
         console.log("Cleared alarms")
     }
-    // console.log('Current storage bytes in use: ' + await getBytesInUseSync(null));
-    // if no other requests are in storage delete alarm
-    /*
-    if (await getBytesInUseSync(null) === 0) {
-        chrome.alarms.clearAll();
-        console.log("Cleared alarms")
-    }
-    */
 });
 
 // Set alarm if storage changes and we have at least one storage entry
