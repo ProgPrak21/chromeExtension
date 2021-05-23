@@ -25,7 +25,7 @@ async function getCurrentTab() {
     let descriptionDiv = document.getElementById("description");
     descriptionDiv.innerHTML = "This Site is supported!";
 
-    // Create and initialize Button
+    // Create and initialize Request Button
     let issueRequestBtn = document.createElement("button");
     issueRequestBtn.id = "issueRequest";
     issueRequestBtn.innerHTML = "Request Data";
@@ -38,7 +38,38 @@ async function getCurrentTab() {
     issueRequestBtn.addEventListener("click", async () => {
       // open the page to request the data in the current tab
       const connector = await import(`/connectors/${hostname}.js`);
-      await connector.run(tab);
+      await connector.run();
+    });
+
+    // Create and initialize Check Button
+    let checkRequestBtn = document.createElement("button");
+    checkRequestBtn.id = "requestCheck";
+    checkRequestBtn.innerHTML = "Check Request";
+    document.body.append(checkRequestBtn);
+
+    document.body.insertBefore(document.createElement("br"), checkRequestBtn);
+
+    checkRequestBtn.addEventListener("click", async () => {
+      // open the page to request the data in the current tab
+      const connector = await import(`/connectors/${hostname}.js`);
+      await connector.check();
+    });
+
+    // Create and initialize Check Button
+    let downloadRequestBtn = document.createElement("button");
+    downloadRequestBtn.id = "requestDownload";
+    downloadRequestBtn.innerHTML = "Download Request";
+    document.body.append(downloadRequestBtn);
+
+    document.body.insertBefore(
+      document.createElement("br"),
+      downloadRequestBtn
+    );
+
+    downloadRequestBtn.addEventListener("click", async () => {
+      // open the page to request the data in the current tab
+      const connector = await import(`/connectors/${hostname}.js`);
+      await connector.download();
     });
   } else {
     // it not, display something like:
