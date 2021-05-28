@@ -63,3 +63,17 @@ async function waitForChangeToUrl(tabToWatch, url) {
         });
     });
 }
+
+async function exists(fileName) {
+    return new Promise((resolve) => {
+      chrome.runtime.getPackageDirectoryEntry(function(root) {
+    
+    
+        root.getDirectory("connectors", {create : false}, function() {
+      resolve(true);
+    }, function() {
+      resolve(false);
+    });
+    }
+    })
+  }
