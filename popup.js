@@ -5,7 +5,7 @@ async function getCurrentTab() {
 }
 
 async function exists(hostname) {
-  const response = await fetch(`/connectors/${hostname}.js`);
+  const response = await (fetch(`/connectors/${hostname}.js`).catch(function () {return false}));
   if (response.status == 200) {
     return true;
   } else {
